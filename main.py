@@ -2,8 +2,8 @@ import argparse
 import sys
 
 from processing.service import build_city_summary
-from clients.weather import WeatherError
-from clients.rates import RateError
+from clients.weather import WeatherError, CityNotFoundError
+from clients.rates import RateError, CurrencyNotFoundError
 
 
 parser = argparse.ArgumentParser()
@@ -16,6 +16,14 @@ args = parser.parse_args()
 
 try:
     result = build_city_summary(args.city, args.currency)
+
+except CityNotFoundError as error:
+    print(f"Ошибка: {error}")
+    sys.exit(3)
+
+except CurrencyNotFoundError as error:
+    print(f"Ошибка: {error}")
+    sys.exit(3)
 
 except WeatherError as error:
     print(f"Ошибка погоды: {error}")

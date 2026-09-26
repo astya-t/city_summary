@@ -5,6 +5,10 @@ class WeatherError(Exception):
     pass
 
 
+class CityNotFoundError(WeatherError):
+    pass
+
+
 def get_weather(city):
     try:
         url = (
@@ -13,6 +17,9 @@ def get_weather(city):
         )
 
         data = get_json(url)
+
+        if not data.get("results"):
+            raise CityNotFoundError(f"Город не найден: {city}")
 
         results = data["results"][0]
 
@@ -33,6 +40,9 @@ def get_weather(city):
         return {
             "temp_c": temperature
         }
+
+    except CityNotFoundError:
+        raise
 
     except Exception as error:
         raise WeatherError(
