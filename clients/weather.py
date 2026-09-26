@@ -18,10 +18,28 @@ def get_weather(city):
 
         data = get_json(url)
 
-        if not data.get("results"):
+        if not isinstance(data, dict):
+            raise ValueError("Некорректный формат ответа геокодирования")
+
+        if "results" not in data:
+            raise ValueError("В ответе отсутствует поле 'results'")
+
+        if not isinstance(data["results"], list):
+            raise ValueError("Поле 'results' должно быть списком")
+
+        if not data["results"]:
             raise CityNotFoundError(f"Город не найден: {city}")
 
         results = data["results"][0]
+
+        if not isinstance(results, dict):
+            raise ValueError("Некорректный формат данных о городе")
+
+        if "latitude" not in results:
+            raise ValueError("В данных города отсутствует 'latitude'")
+
+        if "longitude" not in results:
+            raise ValueError("В данных города отсутствует 'longitude'")
 
         latitude = results["latitude"]
         longitude = results["longitude"]
@@ -35,7 +53,26 @@ def get_weather(city):
 
         data = get_json(url)
 
+        if not isinstance(data, dict):
+            raise ValueError("Некорректный формат ответа прогноза")
+
+        if "current" not in data:
+            raise ValueError("В ответе отсутствует поле 'current'")
+
+        if not isinstance(data["current"], dict):
+            raise ValueError("Поле 'current' должно быть словарём")
+
+        if "temperature_2m" not in data["current"]:
+            raise ValueError(
+                "В ответе отсутствует поле 'temperature_2m'"
+            )
+
         temperature = data["current"]["temperature_2m"]
+
+        if not isinstance(temperature, (int, float)):
+            raise ValueError(
+                "Температура должна быть числом"
+            )
 
         return {
             "temp_c": temperature

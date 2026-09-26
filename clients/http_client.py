@@ -28,10 +28,11 @@ def get_json(url, max_retries=3):
                 retry_after = error.response.headers.get("Retry-After")
 
                 if retry_after and retry_after.isdigit():
-                    time.sleep(int(retry_after))
-                    last_error = error
-                else:
-                    raise
+                    if attempt < max_retries - 1:
+                        time.sleep(int(retry_after))
+                        continue
+
+                raise
 
             else:
                 raise
