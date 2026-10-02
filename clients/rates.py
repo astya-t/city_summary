@@ -1,3 +1,4 @@
+import requests
 from clients.http_client import get_json
 
 
@@ -21,8 +22,8 @@ def get_rate(currency):
             )
 
         if "rate" not in data:
-            raise CurrencyNotFoundError(
-                f"Валюта не найдена: {currency}"
+            raise ValueError(
+                f"В ответе отсутствует поле 'rate': {currency}"
             )
 
         if not isinstance(data["rate"], (int, float)):
@@ -32,15 +33,13 @@ def get_rate(currency):
 
         return data["rate"]
 
-    except CurrencyNotFoundError:
-        raise
+    except requests.exceptions.HTTPError as error:
+        if error.response.status_code==422:
+            raise CurrencyNotFoundError(f"Валюта не найдена: {currency}")
+        else:
+            raise RateError(f"Не удалось получить курс валюты: {error}")
 
     except Exception as error:
-        if "422 Client Error" in str(error):
-            raise CurrencyNotFoundError(
-                f"Валюта не найдена: {currency}"
-            )
-
         raise RateError(
             f"Не удалось получить курс валюты: {error}"
         )
