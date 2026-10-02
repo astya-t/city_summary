@@ -21,14 +21,13 @@ def get_weather(city):
         if not isinstance(data, dict):
             raise ValueError("Некорректный формат ответа геокодирования")
 
-        if "results" not in data:
-            raise ValueError("В ответе отсутствует поле 'results'")
+        if not data.get("results"):
+            raise CityNotFoundError(f"Город не найден: {city}")
 
         if not isinstance(data["results"], list):
             raise ValueError("Поле 'results' должно быть списком")
 
-        if not data["results"]:
-            raise CityNotFoundError(f"Город не найден: {city}")
+        
 
         results = data["results"][0]
 
